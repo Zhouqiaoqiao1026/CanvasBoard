@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>SCALE & MOVE & MAGNIFY</title>
+    <style type="text/css">
+    #glasscan{
+        display: none;
+        border:1px solid #ccc;
+        border-radius:101px;
+        -webkit-border-radius:101px;
+        -o-border-radius:101px;
+        -moz-border-radius:101px;
+        position: absolute;
+    }
+</style>
+</head>
+<body style="background: black;">
+    <p style="color:#ffffff"></p>
+    <canvas id="canvas" style="display:block;margin:0 auto;border:1px solid #aaa;">
+    您的浏览器尚不支持canvas
+    </canvas>
+
+    <canvas id="glasscan" width="200" height="200"></canvas>
+    <span id="show" style="color:#ffffff"></span>
+   
+    <p style="color:#ffffff;margin-left: 100px;">1.It is not a whole image, show the rest: use bottom slide bar & right slide bar</p>
+    <input type="range" id="scale-range-x" min="0" max="2304" step="10" value="1200" style="display:block;margin:20px auto;width:800px"/>
+     <input type="range" id="scale-range-y" min="0" max="1536" step="10" value="1000" style="-webkit-appearance: slider-vertical;display:block;height:600px;position: absolute;top:0;margin-top: 50px;margin-left: 1150px;"/>
+     <p style="color:#ffffff;margin-left: 100px;">2.Magnify:</p>
+    <input type="button" style="position: absolute;top: 0;margin-top: 920px;margin-left:200px;" id="glass" value="Click this button:switch to the magnifying glass">
+    <script>
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        var glasscan = document.getElementById("glasscan")
+        var glassContext = glasscan.getContext("2d");
+        var mouse = captureMouse(canvas);
+        var slider_x = document.getElementById("scale-range-x");
+        var slider_y = document.getElementById("scale-range-y");
+        var image = new Image();
+      
+        window.onload = function(){
+
+            canvas.width = 1152
+            canvas.height = 768
+          
+            var scale_x = slider_x.value
+            var scale_y = slider_y.value
+            image.src = "img-M.jpg"
+
+            image.onload = function(){
+                
+                 drawImageByScale( scale_x,scale_y )
+               
+                slider_x.onchange = function(){
+                   scale_x = slider_x.value
+                   //scale_y = slider_y.value
+                    drawImageByScale( scale_x,scale_y )
+                }
+                slider_y.onchange = function(){
+                   //scale_x = slider_x.value
+                   scale_y = slider_y.value
+                    drawImageByScale( scale_x,scale_y )
+                }
+            }
+        }
+    
+         function drawImageByScale( scale_x, scale_y){            
+            var imageWidth = 1152        
+            var imageHeight = 768     
+          //  x = canvas.width /2 - imageWidth / 2            
+            //y = canvas.height / 2 - imageHeight / 2            
+            context.clearRect( 0 , 0 , canvas.width , canvas.height )            
+            context.drawImage( image , scale_x,1536-scale_y,1152,768,0 , 0 , imageWidth , imageHeight );    
+        }
+     
+      var btn=document.getElementById("glass");
+      btn.onclick=function(){
+        context.drawImage( image , 0,0,3456,2304,0 , 0 , 1152 , 768 );  
+          
+              //获取元素内鼠标位置
+   
+    //给画布绑定鼠标移动事件
+    canvas.onmousemove = function(){
+          // glassContext.clearRect(0,0,glasscan.width,glasscan.height);
+           glasscan.style.left = mouse.x + 10 + 'px';
+           glasscan.style.top = mouse.y + 10 + 'px';
+           glasscan.style.display = "block";
+         //  document.getElementById("show").innerText = mouse.x + '|' + mouse.y;     //显示鼠标位置
+            var drawWidth = 50,
+                drawHeight = 50;
+            glassContext.drawImage(image,3*(mouse.x),3*(mouse.y),drawWidth*2,drawHeight*2,0,0,drawWidth*4,drawHeight*4);     //实现放大镜
+    };
+      }
+    
+ function captureMouse(element){
+        var  mouse = {x:0 , y:0};
+        element.addEventListener('mousemove' , function(event){
+        var x , y;
+        if(event.pageX || event.pageY){
+            x = event.pageX;
+            y = event.pageY;
+        }else{
+            x = event.clientX + (document.body.scrollLeft || 
+            document.documentElement.scrollLeft);
+            y = event.clientY + (document.body.scrollTop || 
+            document.documentElement.scrollTop);
+        }
+        x -= element.offsetLeft;
+        y -= element.offsetTop;
+        mouse.x = x;
+        mouse.y = y;
+        } , false)
+        return mouse;
+    }
+
+    </script>
+</body>
+</html>

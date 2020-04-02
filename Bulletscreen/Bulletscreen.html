@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CH3EX2: Text Arranger Version 2.0</title>
+<script src="modernizr.js"></script>
+<script type="text/javascript" src="jscolor/jscolor.js"></script>
+<script type="text/javascript">
+
+window.addEventListener("load", eventWindowLoaded, false);	
+function eventWindowLoaded() {
+
+	canvasApp();
+}
+
+function canvasSupport () {
+  	return Modernizr.canvas;
+}
+
+function canvasApp() {
+	
+	var message = "your text";
+	var fillOrStroke ="fill";
+	
+	var fontSize = "50";
+	var fontFace = "serif";
+	var textFillColor ="#ff0000";
+	var textBaseline = "middle";
+	var textAlign = "center";
+	var fontWeight ="normal";
+	var fontStyle = "normal";
+	
+	var startHeight=100;
+	var xPosition=1000;
+	var speed="slow";
+	var x=-10;
+	var y=-3;
+	var z=-15;
+	if (!canvasSupport()) {
+			 return;
+  		}
+	 var msgs=[];
+	var theCanvas = document.getElementById("canvasOne");
+	var context = theCanvas.getContext("2d"); 
+	theCanvas.width=window.innerWidth;   //与浏览器相同
+    theCanvas.height=window.innerHeight*0.6;
+	var formElement = document.getElementById("textBox");
+	formElement.addEventListener('keyup', textBoxChanged, false);
+
+	var formElement = document.getElementById("startheight");  //起始高度
+	formElement.addEventListener('keyup', startheightChanged, false);	
+	
+	formElement = document.getElementById("textSize");
+	formElement.addEventListener('change', textSizeChanged, false);	
+	
+	formElement = document.getElementById("textFillColor");
+	formElement.addEventListener('change', textFillColorChanged, false);	
+	
+	formElement = document.getElementById("textFont");
+	formElement.addEventListener('change', textFontChanged, false);	
+
+	formElement = document.getElementById("speed");   //弹幕速度
+	formElement.addEventListener('change', speedChanged, false);	
+	
+	formElement = document.getElementById("fontWeight");
+	formElement.addEventListener('change', fontWeightChanged, false);	
+	
+	//Background
+	context.clearRect(0,0,1500,500);
+		context.fillStyle = "#000000";
+		context.fillRect(0, 0, theCanvas.width, theCanvas.height);
+	//弹幕对象
+	function danmu(fontWeight,fontStyle,fontSize,fontFace,textFillColor,message,xPosition,startHeight,speed){
+		this.fontWeight=fontWeight;
+		this.fontStyle=fontStyle;
+		this.fontSize=fontSize;
+		this.fontFace=fontFace;
+		this.textFillColor=textFillColor;
+		this.message=message;
+		this.xPosition=xPosition;
+		this.startHeight=startHeight;
+		this.speed=speed;
+	}
+
+function drawScreen(danmu) {    //
+
+		context.beginPath();
+		//Text
+		context.font = danmu.fontWeight + " " + danmu.fontStyle + " " + danmu.fontSize + "px " + danmu.fontFace;
+		context.fillStyle    = danmu.textFillColor;
+		context.fillText  ( danmu.message, danmu.xPosition ,danmu.startHeight);
+		context.closePath();
+		context.fill();
+		switch(danmu.speed){
+			case "medium":
+				danmu.xPosition=danmu.xPosition+x;
+				break;
+			case "slow":
+				danmu.xPosition=danmu.xPosition+y;
+				break;
+			case "fast":
+				danmu.xPosition=danmu.xPosition+z;
+				break;
+		}
+		
+		if(danmu.xPosition<=0){
+			danmu.xPosition=theCanvas.width+500;
+		}
+	}
+	
+
+	function textBoxChanged(e) {
+		var target =  e.target;
+		message = target.value;
+		//drawScreen();
+	
+	}
+	function startheightChanged(e) {   //起始高度
+		var target =  e.target;
+		startHeight = target.value;
+		//drawScreen();
+	
+	}
+	function speedChanged(e) {   //弹幕速度
+		var target =  e.target;
+		speed = target.value;
+		//drawScreen();
+	
+	}
+		
+	function textSizeChanged(e) {
+		var target =  e.target;
+		fontSize = target.value;
+		//drawScreen();
+	}
+	
+	function textFillColorChanged(e) {
+		var target =  e.target;
+		textFillColor = "#" + target.value;
+		//drawScreen();
+	}
+	
+	function textFontChanged(e) {
+		var target =  e.target;
+		fontFace =  target.value;
+		//drawScreen();
+	}
+	
+	function fontWeightChanged(e) {
+		var target =  e.target;
+		fontWeight =  target.value;
+		//drawScreen();
+	}
+	
+	var tt;
+		 document.getElementById("shoot").onclick=function(){
+
+		 var tempBarrage=new danmu(fontWeight,fontStyle,fontSize,fontFace,textFillColor,message,xPosition,startHeight,speed);
+            msgs.push(tempBarrage);
+		}
+	 setInterval(function(){
+           context.clearRect(0, 0, theCanvas.width, theCanvas.height);
+            context.save();
+            for(var i=0;i<msgs.length;i++){
+
+                    drawScreen(msgs[i]);
+
+            }
+
+        },20)
+
+}	
+	
+</script> 
+</head>
+<body>
+<div>
+<canvas id="canvasOne" width="500" height="300" style="background:#000000;">
+ Your browser does not support HTML 5 Canvas. 
+</canvas>
+
+<div id = "show" width="500" height="300" style="position: absolute; top: 20px; left: 30px;color: #ffffff;"></div>
+
+<form>
+  Text: <input id="textBox" placeholder="your text" />
+  <br> 
+  
+ 
+ Text Font: <select id="textFont">
+  <option value="serif">serif</option>
+  <option value="sans-serif">sans-serif</option>
+  <option value="cursive">cursive</option>
+  <option value="fantasy">fantasy</option>
+  <option value="monospace">monospace</option>
+  </select>
+ <br>  
+ Text Size: <input type="range" id="textSize"
+       min="0"
+       max="200"
+       step="1"
+       value="50"/> 
+ <br>      
+ Text Color: <input class="color" id="textFillColor" value="FF0000"/> 
+ <br>
+ Font Weight:
+ <select id="fontWeight">
+ <option value="normal">normal</option>
+ <option value="bold">bold</option>
+ <option value="bolder">bolder</option>
+ <option value="lighter">lighter</option>
+ </select>
+ <br>
+ StartHeight: <input id="startheight" placeholder="100" />
+  <br> 
+ Speed:
+ <select id="speed">
+ <option value="slow">slow</option>
+ <option value="medium">medium</option>
+ <option value="fast">fast</option>
+ </select>
+ <br>
+ 		<input type="button" id="shoot" value="shoot" >
+</div>
+</body>
+</html>
